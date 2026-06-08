@@ -62,9 +62,12 @@ function sfxCountdown(n){beep(n>0?440:880,0.2,0.3);}
 let bgMusic=null;
 function startBgMusic(){
   if(!bgMusic){bgMusic=new Audio('pixel_sprint.mp3');bgMusic.loop=true;bgMusic.volume=0.35;}
-  bgMusic.currentTime=0;bgMusic.play().catch(()=>{});
+  if(bgMusic.paused)bgMusic.play().catch(()=>{});
 }
 function stopBgMusic(){if(bgMusic){bgMusic.pause();bgMusic.currentTime=0;}}
+// start music on first user gesture — browsers block autoplay before interaction
+(function(){function onFirst(){startBgMusic();window.removeEventListener('click',onFirst);window.removeEventListener('keydown',onFirst);}
+window.addEventListener('click',onFirst);window.addEventListener('keydown',onFirst);}());
 
 // ── sprites ──────────────────────────────────────────────────
 const CAR_CELLS=[{col:0,row:0},{col:0,row:1},{col:2,row:1},{col:1,row:1}];
@@ -364,7 +367,7 @@ function updateRace(dt){
     });
     raceEnding=true;endTimer=2.8;
   }
-  if(raceEnding){endTimer-=dt;if(endTimer<=0){stopBgMusic();STATE='results';}}
+  if(raceEnding){endTimer-=dt;if(endTimer<=0)STATE='results';}
 }
 
 // ── render helpers ────────────────────────────────────────────
